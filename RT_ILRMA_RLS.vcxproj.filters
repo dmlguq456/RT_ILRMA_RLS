@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\ASIO">
+      <UniqueIdentifier>{a6c62919-64ce-42ad-a229-81b8c1d73aaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\ASIO">
+      <UniqueIdentifier>{5f867b8c-18c3-4d34-955c-cf680d2c6a02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\FUNCTION">
+      <UniqueIdentifier>{beec3897-d167-4640-9cc4-5c00e12918dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\FUNCTION">
+      <UniqueIdentifier>{e87f3d7e-138b-4c0e-b9c2-9d9d1abb65b9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="asio.cpp">
+      <Filter>소스 파일\ASIO</Filter>
+    </ClCompile>
+    <ClCompile Include="asiodrivers.cpp">
+      <Filter>소스 파일\ASIO</Filter>
+    </ClCompile>
+    <ClCompile Include="asiolist.cpp">
+      <Filter>소스 파일\ASIO</Filter>
+    </ClCompile>
+    <ClCompile Include="iasiothiscallresolver.cpp">
+      <Filter>소스 파일\ASIO</Filter>
+    </ClCompile>
+    <ClCompile Include="RtAudio.cpp">
+      <Filter>소스 파일\ASIO</Filter>
+    </ClCompile>
+    <ClCompile Include="sigproc.cpp">
+      <Filter>소스 파일\FUNCTION</Filter>
+    </ClCompile>
+    <ClCompile Include="stft.cpp">
+      <Filter>소스 파일\FUNCTION</Filter>
+    </ClCompile>
+    <ClCompile Include="tools.cpp">
+      <Filter>소스 파일\FUNCTION</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcBuffers.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ILRMA_Online.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="asio.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="asiodrivers.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="asiodrvr.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="asiolib.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="asiolist.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="asiosys.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="ginclude.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="iasiodrv.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="iasiothiscallresolver.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="RtAudio.h">
+      <Filter>헤더 파일\ASIO</Filter>
+    </ClInclude>
+    <ClInclude Include="header.h">
+      <Filter>헤더 파일\FUNCTION</Filter>
+    </ClInclude>
+    <ClInclude Include="sigproc.h">
+      <Filter>헤더 파일\FUNCTION</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcBuffers.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ILRMA_Online.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
