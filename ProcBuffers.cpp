@@ -1,5 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
-#define MAKE_FILE		1			//option 1 : wav 저장		2: strout 출력
+#define MAKE_FILE		3			//option 1 : wav 저장 (IVA출력 + 입력원본)		2: strout 출력(IVA출력)		3: strout 출력 (IVA출력 + 입력 원본)
 #include <stdio.h>
 #include "ProcBuffers.h"
 #include "sigproc.h"
@@ -248,7 +248,7 @@ int ProcBuffers::Process(double **input, int Nframe, double **output)
 			fwrite(origin_out[i], sizeof(short), BufferSize, IN[i]);
 		}
 
-#else MAKE_FILE ==2
+#elif MAKE_FILE == 2
 
 		for (j = 0; j < BufferSize; j++)
 		{
@@ -259,6 +259,21 @@ int ProcBuffers::Process(double **input, int Nframe, double **output)
 			}
 			cout << IVA_out[0][j] << "	" << IVA_out[1][j] << "\n";
 		}
+
+#else MAKE_FILE == 3
+
+		for (j = 0; j < BufferSize; j++)
+		{
+			for (i = 0; i < Nch; i++)
+			{
+				out_buff[i][j] = output[i][j] * 32768.0;
+				in_buff[i][j] = input_temp[i][j] * 32768.0;
+				IVA_out[i][j] = (short)(out_buff[i][j]);
+				origin_out[i][j] = (short)(in_buff[i][j]);
+			}
+			cout << IVA_out[0][j] << "	" << IVA_out[1][j] << "	" << origin_out[1][j] << "	" << origin_out[1][j] << "\n";
+		}
+
 
 #endif
 
