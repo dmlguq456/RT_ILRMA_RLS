@@ -256,9 +256,12 @@ int ProcBuffers::Process(double **input, int Nframe, double **output)
 			{
 				out_buff[i][j] = output[i][j] * 32768.0;
 				IVA_out[i][j] = (short)(out_buff[i][j]);
-			}
-			cout << IVA_out[0][j] << "	" << IVA_out[1][j] << "\n";
-		}
+				cout << IVA_out[i][j];
+				if (i != Nch - 1)
+					cout << "	";
+	}
+			cout << "\n";
+}
 
 #else MAKE_FILE == 3
 
@@ -267,17 +270,21 @@ int ProcBuffers::Process(double **input, int Nframe, double **output)
 			for (i = 0; i < Nch; i++)
 			{
 				out_buff[i][j] = output[i][j] * 32768.0;
-				in_buff[i][j] = input_temp[i][j] * 32768.0;
 				IVA_out[i][j] = (short)(out_buff[i][j]);
-				origin_out[i][j] = (short)(in_buff[i][j]);
+				cout << IVA_out[i][j] << "	";
 			}
-			cout << IVA_out[0][j] << "	" << IVA_out[1][j] << "	" << origin_out[1][j] << "	" << origin_out[1][j] << "\n";
+			for (i = 0; i < Nch; i++)
+			{
+				in_buff[i][j] = input_temp[i][j] * 32768.0;
+				origin_out[i][j] = (short)(in_buff[i][j]);
+				cout << origin_out[i][j];
+				if (i != Nch - 1)
+					cout << "	";
+			}
+			cout << "\n";
 		}
 
-
 #endif
-
 	}
-
 	return 0;
 }
