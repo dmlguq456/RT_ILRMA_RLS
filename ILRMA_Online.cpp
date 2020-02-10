@@ -510,6 +510,14 @@ void ILRMA::ILRMA_lemma(double **input, int frameInd, double **output)
 		}
 		for (k = 0; k < nfreq; k++)
 		{
+			lambda[i][k] = 0.0;
+			for (j = 0; j < Nrank; j++)
+			{
+				lambda[i][k] += V_nmf[i][j] * T_nmf[i][j][k];
+			}
+		}
+		for (k = 0; k < nfreq; k++)
+		{
 			for (j = 0; j < Nrank; j++)
 			{
 				A_T_nmf[i][j][k] = f_alpha * A_T_nmf[i][j][k] + (T_nmf[i][j][k]*T_nmf[i][j][k]) * Pwr[i][k] * V_nmf[i][j] / (lambda[i][k]*lambda[i][k]);
