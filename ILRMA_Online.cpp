@@ -47,7 +47,7 @@ ILRMA::ILRMA()
 	{
 		for (j = 0; j < Nrank; j++)
 		{
-			V_nmf[i][j] = (rand() / max);
+			V_nmf[i][j] = (rand() / max) + epsi;
 		}
 	}
 	T_nmf = new double **[Nch]; // Nch X Nrank X Nfreq
@@ -83,7 +83,7 @@ ILRMA::ILRMA()
 		{
 			for (k = 0; k < nfreq; k++)
 			{
-				T_nmf[i][j][k] = (rand() / max);
+				T_nmf[i][j][k] = (rand() / max) + epsi;
 				A_T_nmf[i][j][k] = 0.0;
 				B_T_nmf[i][j][k] = 0.0;
 			}
@@ -485,6 +485,14 @@ void ILRMA::ILRMA_lemma(double **input, int frameInd, double **output)
 	// update bases frame by frame
 	for (i = 0; i < Nch; i++)
 	{
+		for (k = 0; k < nfreq; k++)
+		{
+			lambda[i][k] = 0.0;
+			for (j = 0; j < Nrank; j++)
+			{
+				lambda[i][k] += V_nmf[i][j] * T_nmf[i][j][k];
+			}
+		}
 		for (j = 0; j < Nrank; j++)
 		{
 			double Numer_V = 0.0;
@@ -498,14 +506,6 @@ void ILRMA::ILRMA_lemma(double **input, int frameInd, double **output)
 			if (V_nmf[i][j] < epsi)
 			{
 				V_nmf[i][j] = epsi;
-			}
-		}
-		for (k = 0; k < nfreq; k++)
-		{
-			lambda[i][k] = 0.0;
-			for (j = 0; j < Nrank; j++)
-			{
-				lambda[i][k] += V_nmf[i][j] * T_nmf[i][j][k];
 			}
 		}
 		for (k = 0; k < nfreq; k++)
@@ -829,8 +829,8 @@ void ILRMA::ILRMA_lemma(double **input, int frameInd, double **output)
 		{
 			for (ch2 = 0; ch2 < Nch; ch2++)
 			{
-				Wbp[ch1][ch2][re] = A[0][ch1][re] * W[ch1][ch2][re] - A[0][ch1][im] * W[ch1][ch2][im];
-				Wbp[ch1][ch2][im] = A[0][ch1][re] * W[ch1][ch2][im] + A[0][ch1][im] * W[ch1][ch2][re];
+				Wbp[ch1][ch2][re] = A[ch1][ch1][re] * W[ch1][ch2][re] - A[ch1][ch1][im] * W[ch1][ch2][im];
+				Wbp[ch1][ch2][im] = A[ch1][ch1][re] * W[ch1][ch2][im] + A[ch1][ch1][im] * W[ch1][ch2][re];
 			}
 		}
 

@@ -1,7 +1,7 @@
-#define Nch			2
-#define nWin		1024
+#define Nch			3
+#define nWin		2048
 #define Nrank		2
-#define BufferSize		256
+#define BufferSize		512
 #define SamplingFreq	16000
 
 
