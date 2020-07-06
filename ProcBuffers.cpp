@@ -1,5 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
-#define MAKE_FILE		3			//option 1 : wav 저장 (IVA출력 + 입력원본)		2: strout 출력(IVA출력)		3: strout 출력 (IVA출력 + 입력 원본)
+#define MAKE_FILE		1			//option 1 : wav 저장 (IVA출력 + 입력원본)		2: strout 출력(IVA출력)		3: strout 출력 (IVA출력 + 입력 원본)
 #include <stdio.h>
 #include "ProcBuffers.h"
 #include "sigproc.h"
@@ -259,9 +259,9 @@ int ProcBuffers::Process(double **input, int Nframe, double **output)
 				cout << IVA_out[i][j];
 				if (i != Nch - 1)
 					cout << "	";
-	}
+			}
 			cout << "\n";
-}
+		}
 
 #else MAKE_FILE == 3
 
