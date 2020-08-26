@@ -1,114 +1,56 @@
 #include <stdio.h>
-#include "ILRMA_Online.h"
+#include "AUXIVA_ICD_Online.h"
 #include "header.h"
 #include "sigproc.h"
 #include <stdlib.h>
 
-ILRMA::ILRMA()
+AUXIVA_ICD::AUXIVA_ICD()
 {
 	nfft = nWin;
 	nshift = nWin / 4;
 	nol = 3 * nWin / 4;
 	nfreq = nfft / 2 + 1;
 	//epsi = 0.000001;
-	epsi = 2.220446049250313 * 1E-16;
-	f_alpha = 0.96;
-	f_alpha2 = 0.95;
-	Nrank = 2;
+	epsi = 2.220446049250313*1E-16;
+	eps = 1E-8;
+	f_alpha = 0.98;
+	f_alpha2 = 0.0;
 	double max = 32767;
-
 	int i, j, k, freq, ch;
 	int re, im;
-	X = new double* [Nch]; // Nch X Nfreq(Complex)
+
+	X = new double *[Nch]; // Nch X Nfreq(Complex)
 	for (i = 0; i < Nch; i++)
 	{
 		X[i] = new double[nfreq * 2];
 	}
-	X_r = new double* [Nch]; // Nch X Nfreq(Complex)
+	X_r = new double *[Nch]; // Nch X Nfreq(Complex)
 	for (i = 0; i < Nch; i++)
 	{
 		X_r[i] = new double[nfreq * 2];
 	}
-	Y = new double* [Nch]; // Nch X Nfreq(Complex)
-	for (i = 0; i < Nch; i++)
+	Y = new double *[Nch]; // Nch X Nfreq(Complex)
+	for (i = 0; i < Nch; i++) 
 	{
 		Y[i] = new double[nfreq * 2];
 	}
-	Pwr = new double* [Nch]; // Nch X Nfreq
+	Pwr = new double *[Nch]; // Nch X Nfreq
 	for (i = 0; i < Nch; i++)
 	{
 		Pwr[i] = new double[nfreq];
 	}
-	D = new double[nfreq]; // Nfreq
-	V_nmf = new double* [Nch]; // Nch X Nrank
+
+	phi = new double *[Nch]; // Nch X Nfreq
 	for (i = 0; i < Nch; i++)
 	{
-		V_nmf[i] = new double[Nrank];
+		phi[i] = new double[nfreq];
 	}
-	for (i = 0; i < Nch; i++)
-	{
-		for (j = 0; j < Nrank; j++)
-		{
-			V_nmf[i][j] = (rand() / max) + epsi;
-		}
-	}
-	T_nmf = new double** [Nch]; // Nch X Nrank X Nfreq
-	for (i = 0; i < Nch; i++)
-	{
-		T_nmf[i] = new double* [Nrank];
-		for (j = 0; j < Nrank; j++)
-		{
-			T_nmf[i][j] = new double[nfreq];
-		}
-	}
-	A_T_nmf = new double** [Nch]; // Nch X Nrank X Nfreq
-	for (i = 0; i < Nch; i++)
-	{
-		A_T_nmf[i] = new double* [Nrank];
-		for (j = 0; j < Nrank; j++)
-		{
-			A_T_nmf[i][j] = new double[nfreq];
-		}
-	}
-	B_T_nmf = new double** [Nch]; // Nch X Nrank X Nfreq
-	for (i = 0; i < Nch; i++)
-	{
-		B_T_nmf[i] = new double* [Nrank];
-		for (j = 0; j < Nrank; j++)
-		{
-			B_T_nmf[i][j] = new double[nfreq];
-		}
-	}
-	for (i = 0; i < Nch; i++)
-	{
-		for (j = 0; j < Nrank; j++)
-		{
-			for (k = 0; k < nfreq; k++)
-			{
-				T_nmf[i][j][k] = (rand() / max) + epsi;
-				A_T_nmf[i][j][k] = 0.0;
-				B_T_nmf[i][j][k] = 0.0;
-			}
-		}
-	}
-	lambda = new double* [Nch]; // Nch X Nfreq
-	for (i = 0; i < Nch; i++)
-	{
-		lambda[i] = new double[nfreq];
-	}
-	for (i = 0; i < Nch; i++)
-	{
-		for (j = 0; j < nfreq; j++)
-		{
-			lambda[i][j] = 1.0;
-		}
-	}
-	invWDE = new double* [Nch]; // Nch X Nfreq(Complex)
+	invWDE = new double *[Nch]; // Nch X Nfreq(Complex)
 	for (i = 0; i < Nch; i++)
 	{
 		invWDE[i] = new double[nfreq * 2];
 	}
-	diag_WV = new double* [Nch]; // Nch X Nfreq(Complex)
+	diag_WV = new double*[Nch]; // Nch X Nfreq(Complex)
 	for (i = 0; i < Nch; i++)
 	{
 		diag_WV[i] = new double[nfreq * 2];
@@ -116,37 +58,37 @@ ILRMA::ILRMA()
 	win_STFT = new double[nWin];
 	for (i = 0; i < nWin; i++)
 	{
-		win_STFT[i] = sqrt((double)2 / 3) * 0.5 * (1.0 - cos(2.0 * (double)M_PI * (double)(i) / (nWin)));
+		win_STFT[i] = sqrt((double)2/3) * 0.5 * (1.0 - cos(2.0 * (double)M_PI*(double)(i) / (nWin)));
 	}
-	W = new double** [Nch];
+	W = new double **[Nch];
 	for (i = 0; i < Nch; i++)
 	{
-		W[i] = new double* [Nch];
+		W[i] = new double*[Nch];
 		for (j = 0; j < Nch; j++)
 		{
-			W[i][j] = new double[nfreq * 2];
+			W[i][j] = new double[nfreq * 2];		
 		}
 	}
-	V = new double*** [Nch];
+	V = new double ***[Nch];
 	for (i = 0; i < Nch; i++)
 	{
-		V[i] = new double** [Nch];
+		V[i] = new double**[Nch];
 		for (j = 0; j < Nch; j++)
-		{
-			V[i][j] = new double* [nfreq * 2];
+		{		
+			V[i][j] = new double*[nfreq * 2];
 			for (k = 0; k < nfreq * 2; k++)
 			{
 				V[i][j][k] = new double[Nch];
 			}
 		}
 	}
-	U = new double*** [Nch];
+	U = new double ***[Nch];
 	for (i = 0; i < Nch; i++)
 	{
-		U[i] = new double** [Nch];
+		U[i] = new double**[Nch];
 		for (j = 0; j < Nch; j++)
 		{
-			U[i][j] = new double* [nfreq * 2];
+			U[i][j] = new double*[nfreq * 2];
 			for (k = 0; k < nfreq * 2; k++)
 			{
 				U[i][j][k] = new double[Nch];
@@ -178,39 +120,39 @@ ILRMA::ILRMA()
 	}
 
 	//frameInd over 2
-	p = new double* [Nch];
+	p = new double*[Nch];
 	for (ch = 0; ch < Nch; ch++)
 	{
 		p[ch] = new double[nfreq];
 	}
 	Unumer = new double[nfreq * 2];
-	Udenom = new double** [Nch];
+	Udenom = new double**[Nch];
 	for (ch = 0; ch < Nch; ch++)
 	{
-		Udenom[ch] = new double* [Nch];
+		Udenom[ch] = new double*[Nch];
 		for (i = 0; i < Nch; i++)
 		{
 			Udenom[ch][i] = new double[nfreq * 2];
-		}
+		}		
 	}
-	p_U_X = new double* [Nch];
+	p_U_X = new double*[Nch];
 	for (ch = 0; ch < Nch; ch++)
 	{
 		p_U_X[ch] = new double[nfreq * 2];
 	}
-	X_T_U = new double* [Nch];
+	X_T_U = new double*[Nch];
 	for (ch = 0; ch < Nch; ch++)
 	{
 		X_T_U[ch] = new double[nfreq * 2];
 	}
-	p_U_X_X = new double*** [Nch];
-	for (ch = 0; ch < Nch; ch++)
+	p_U_X_X = new double***[Nch];
+	for ( ch = 0; ch < Nch; ch++)
 	{
-		p_U_X_X[ch] = new double** [Nch];
-		for (i = 0; i < Nch; i++)
+		p_U_X_X[ch] = new double**[Nch];
+		for ( i = 0; i < Nch; i++)
 		{
-			p_U_X_X[ch][i] = new double* [nfreq * 2];
-			for (j = 0; j < nfreq * 2; j++)
+			p_U_X_X[ch][i] = new double*[nfreq * 2];
+			for ( j = 0; j < nfreq * 2; j++)
 			{
 				p_U_X_X[ch][i][j] = new double[Nch];
 			}
@@ -220,30 +162,30 @@ ILRMA::ILRMA()
 	//normalizing
 	normCoef = new double[nfreq * 2];
 	sqnorm = new double[nfreq * 2];
-	A = new double** [Nch];
+	A = new double**[Nch];
 	for (i = 0; i < Nch; i++)
 	{
-		A[i] = new double* [Nch];
+		A[i] = new double*[Nch];
 		for (j = 0; j < Nch; j++)
 		{
 			A[i][j] = new double[nfreq * 2];
 		}
 	}
-	WDE_V = new double* [Nch];
-	for (i = 0; i < Nch; i++)
+	WDE_V = new double*[Nch];
+	for ( i = 0; i < Nch; i++)
 	{
 		WDE_V[i] = new double[nfreq * 2];
 	}
-	w = new double* [Nch];
-	for (i = 0; i < Nch; i++)
+	w = new double*[Nch];
+	for ( i = 0; i < Nch; i++)
 	{
 		w[i] = new double[nfreq * 2];
 	}
-	dW = new double** [Nch];
-	for (i = 0; i < Nch; i++)
+	dW = new double**[Nch];
+	for ( i = 0; i < Nch; i++)
 	{
-		dW[i] = new double* [Nch];
-		for (j = 0; j < Nch; j++)
+		dW[i] = new double*[Nch];
+		for ( j = 0; j < Nch; j++)
 		{
 			dW[i][j] = new double[nfreq * 2];
 		}
@@ -251,42 +193,42 @@ ILRMA::ILRMA()
 
 	//Calculate A
 	Anumer = new double[nfreq * 2];
-	AdW = new double** [Nch];
+	AdW = new double**[Nch];
 	for (i = 0; i < Nch; i++)
 	{
-		AdW[i] = new double* [Nch];
+		AdW[i] = new double*[Nch];
 		for (j = 0; j < Nch; j++)
 		{
 			AdW[i][j] = new double[nfreq * 2];
 		}
 	}
-	Adenom = new double** [Nch];
-	for (i = 0; i < Nch; i++)
+	Adenom = new double**[Nch];
+	for ( i = 0; i < Nch; i++)
 	{
-		Adenom[i] = new double* [Nch];
-		for (j = 0; j < Nch; j++)
+		Adenom[i] = new double*[Nch];
+		for ( j = 0; j < Nch; j++)
 		{
 			Adenom[i][j] = new double[nfreq * 2];
 		}
 	}
 
 	//Result
-	Wbp = new double** [Nch];
+	Wbp = new double**[Nch];
 	for (i = 0; i < Nch; i++)
 	{
-		Wbp[i] = new double* [Nch];
+		Wbp[i] = new double*[Nch];
 		for (j = 0; j < Nch; j++)
 		{
-			Wbp[i][j] = new double[nfreq * 2];
+			Wbp[i][j] = new double[nfreq * 2]; 
 		}
 	}
-	Ytmp = new double* [Nch];
+	Ytmp = new double*[Nch];
 	for (i = 0; i < Nch; i++)
 	{
 		Ytmp[i] = new double[nfreq * 2];
 	}
-	Ybuff = new double* [Nch];
-	for (i = 0; i < Nch; i++)
+	Ybuff = new double*[Nch];
+	for ( i = 0; i < Nch; i++)
 	{
 		Ybuff[i] = new double[nWin];
 	}
@@ -305,7 +247,7 @@ ILRMA::ILRMA()
 
 }
 
-ILRMA::~ILRMA()
+AUXIVA_ICD::~AUXIVA_ICD()
 {
 	int i, j, k;
 	for (i = 0; i < Nch; i++)
@@ -316,7 +258,7 @@ ILRMA::~ILRMA()
 			{
 				delete[] V[i][j][k];
 				delete[] U[i][j][k];
-				delete[] p_U_X_X[i][j][k];
+     			delete[] p_U_X_X[i][j][k];
 			}
 			delete[] V[i][j];
 			delete[] U[i][j];
@@ -330,31 +272,22 @@ ILRMA::~ILRMA()
 	delete[] U;
 	delete[] p_U_X_X;
 
-
 	for (i = 0; i < Nch; i++)
 	{
 		for (j = 0; j < Nch; j++)
 		{
 			delete[] W[i][j];
 		}
-		for (j = 0; j < Nrank; j++)
-		{
-			delete[] T_nmf[i][j];
-			delete[] A_T_nmf[i][j];
-			delete[] B_T_nmf[i][j];
-		}
-		delete[] V_nmf[i];
-		delete[] T_nmf[i];
-		delete[] A_T_nmf[i];
-		delete[] B_T_nmf[i];
 		delete[] X[i];
 		delete[] X_r[i];
 		delete[] Y[i];
 		delete[] Pwr[i];
+		delete[] phi[i];
 		delete[] W[i];
 		delete[] invWDE[i];
 		delete[] diag_WV[i];
 		delete[] lambda[i];
+		delete[] lambda_tmp[i];
 
 	}
 	delete[] X;
@@ -362,19 +295,17 @@ ILRMA::~ILRMA()
 	delete[] Y;
 	delete[] Pwr;
 	delete[] lambda;
-	delete[] T_nmf;
-	delete[] A_T_nmf;
-	delete[] B_T_nmf;
-	delete[] V_nmf;
+	delete[] lambda_tmp;
 	delete[] W;
 	delete[] invWDE;
 	delete[] diag_WV;
 	delete[] win_STFT;
+	delete[] phi;
 
 	//frameInd over 2
-	for (i = 0; i < Nch; i++)
+	for ( i = 0; i < Nch; i++)
 	{
-		for (j = 0; j < Nch; j++)
+		for ( j = 0; j < Nch; j++)
 		{
 			delete[] Udenom[i][j];
 		}
@@ -392,9 +323,9 @@ ILRMA::~ILRMA()
 	//normalizing
 	delete[] normCoef;
 	delete[] sqnorm;
-	for (i = 0; i < Nch; i++)
+	for ( i = 0; i < Nch; i++)
 	{
-		for (j = 0; j < Nch; j++)
+		for ( j = 0; j < Nch; j++)
 		{
 			delete[] A[i][j];
 			delete[] dW[i][j];
@@ -410,9 +341,9 @@ ILRMA::~ILRMA()
 	delete[] w;
 
 	//Calculate A
-	for (i = 0; i < Nch; i++)
+	for ( i = 0; i < Nch; i++)
 	{
-		for (j = 0; j < Nch; j++)
+		for ( j = 0; j < Nch; j++)
 		{
 			delete[] AdW[i][j];
 			delete[] Adenom[i][j];
@@ -425,9 +356,9 @@ ILRMA::~ILRMA()
 	delete[] Anumer;
 
 	//result
-	for (i = 0; i < Nch; i++)
+	for ( i = 0; i < Nch; i++)
 	{
-		for (j = 0; j < Nch; j++)
+		for ( j = 0; j < Nch; j++)
 		{
 			delete[] Wbp[i][j];
 		}
@@ -440,9 +371,9 @@ ILRMA::~ILRMA()
 	delete[] Ybuff;
 }
 
-void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
+void AUXIVA_ICD::AUXIVA_ICD_RLS(double **input, int frameInd, double **output)
 {
-	int i, j, k, ch, channel, freq, freqInd;
+	int i, j, ch, channel, freq, freqInd, cliq;
 	int ch1, ch2;
 	int re, im;
 	for (ch = 0; ch < Nch; ch++)
@@ -453,12 +384,12 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 		}
 		hfft3(X[ch], nfft, 1);
 	}
-
+	
 	for (freq = 0; freq < nfreq; freq++)
 	{
 		re = freq + freq;
 		im = re + 1;
-		for (ch1 = 0; ch1 < Nch; ch1++)
+		for ( ch1 = 0; ch1 < Nch; ch1++)
 		{
 			Y[ch1][re] = 0.0;
 			Y[ch1][im] = 0.0;
@@ -469,6 +400,7 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 			}
 		}
 	}
+
 	// Pwr
 	for (i = 0; i < Nch; i++)
 	{
@@ -483,111 +415,83 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 			}
 		}
 	}
-	// optimize time activation at current frame according to bases
-	// update bases frame by frame
-	for (i = 0; i < Nch; i++)
+	clique CLIQUE(OPTION);
+	CLIQUE.clique_matrix();
+	if (frameInd == 3)
 	{
-		for (k = 0; k < nfreq; k++)
+		lambda = new double* [Nch];
+		for (ch = 0; ch < Nch; ch++)
 		{
-			lambda[i][k] = 0.0;
-			for (j = 0; j < Nrank; j++)
-			{
-				lambda[i][k] += V_nmf[i][j] * T_nmf[i][j][k];
-			}
+			lambda[ch] = new double[CLIQUE.ncliq];
 		}
-		for (j = 0; j < Nrank; j++)
+		lambda_tmp = new double* [Nch];
+		for (ch = 0; ch < Nch; ch++)
 		{
-			double Numer_V = 0.0;
-			double Denom_V = 0.0;
-			for (k = 0; k < nfreq; k++)
-			{
-				Numer_V += Pwr[i][k] * T_nmf[i][j][k] / (lambda[i][k] * lambda[i][k]);
-				Denom_V += T_nmf[i][j][k] / (lambda[i][k]);
-			}
-			V_nmf[i][j] = V_nmf[i][j] * sqrt(Numer_V / Denom_V);
-			if (V_nmf[i][j] < epsi)
-			{
-				V_nmf[i][j] = epsi;
-			}
+			lambda_tmp[ch] = new double[CLIQUE.ncliq];
 		}
-		for (k = 0; k < nfreq; k++)
+		for (ch = 0; ch < Nch; ch++)
 		{
-			lambda[i][k] = 0.0;
-			for (j = 0; j < Nrank; j++)
+			for (cliq = 0; cliq < CLIQUE.ncliq; cliq++)
 			{
-				lambda[i][k] += V_nmf[i][j] * T_nmf[i][j][k];
-			}
-		}
-		if (frameInd == 3)
-		{
-			for (k = 0; k < nfreq; k++)
-			{
-				for (j = 0; j < Nrank; j++)
+				lambda[ch][cliq] = 0.0;
+				double sum_C = 0.0;
+				for (freq = 0; freq < nfreq; freq++)
 				{
-					A_T_nmf[i][j][k] = (T_nmf[i][j][k] * T_nmf[i][j][k]) * Pwr[i][k] * V_nmf[i][j] / (lambda[i][k] * lambda[i][k]);
-					B_T_nmf[i][j][k] = V_nmf[i][j] / (lambda[i][k]);
-					T_nmf[i][j][k] = sqrt(A_T_nmf[i][j][k] / B_T_nmf[i][j][k]);
-					if (T_nmf[i][j][k] < epsi)
-					{
-						T_nmf[i][j][k] = epsi;
-					}
+					sum_C += CLIQUE.C[cliq][freq];
+					lambda[ch][cliq] += CLIQUE.C[cliq][freq] * Pwr[ch][freq];
+				}
+				lambda[ch][cliq] = lambda[ch][cliq] / sum_C;
+			}
+		}
+	}
+	else
+	{
+		for (ch = 0; ch < Nch; ch++)
+		{
+			for (cliq = 0; cliq < CLIQUE.ncliq; cliq++)
+			{
+				lambda_tmp[ch][cliq] = 0.0;
+				double sum_C = 0.0;
+				for (freq = 0; freq < nfreq; freq++)
+				{
+					sum_C += CLIQUE.C[cliq][freq];
+					lambda_tmp[ch][cliq] += CLIQUE.C[cliq][freq] * Pwr[ch][freq];
+				}
+				lambda_tmp[ch][cliq] = lambda_tmp[ch][cliq] / sum_C;
+				lambda[ch][cliq] = f_alpha2 * lambda[ch][cliq] + (1 - f_alpha2) * lambda_tmp[ch][cliq];
+				if (lambda[ch][cliq] < eps)
+				{
+					lambda[ch][cliq] = eps;
 				}
 			}
-		}
-		else
-		{
-			for (k = 0; k < nfreq; k++)
-			{
-				for (j = 0; j < Nrank; j++)
-				{
-					A_T_nmf[i][j][k] = f_alpha2 * A_T_nmf[i][j][k] + (1 - f_alpha2) * (T_nmf[i][j][k] * T_nmf[i][j][k]) * Pwr[i][k] * V_nmf[i][j] / (lambda[i][k] * lambda[i][k]);
-					B_T_nmf[i][j][k] = f_alpha2 * B_T_nmf[i][j][k] + (1 - f_alpha2) * V_nmf[i][j] / (lambda[i][k]);
-					T_nmf[i][j][k] = sqrt(A_T_nmf[i][j][k] / B_T_nmf[i][j][k]);
-					if (T_nmf[i][j][k] < epsi)
-					{
-						T_nmf[i][j][k] = epsi;
-					}
-				}
-			}
-		}
-		for (k = 0; k < nfreq; k++)
-		{
-			lambda[i][k] = 0.0;
-			for (j = 0; j < Nrank; j++)
-			{
-				lambda[i][k] += V_nmf[i][j] * T_nmf[i][j][k];
-			}
-		}
-		for (j = 0; j < Nrank; j++)
-		{
-			double Numer_V = 0.0;
-			double Denom_V = 0.0;
-			for (k = 0; k < nfreq; k++)
-			{
-				Numer_V += Pwr[i][k] * T_nmf[i][j][k] / (lambda[i][k] * lambda[i][k]);
-				Denom_V += T_nmf[i][j][k] / (lambda[i][k]);
-			}
-			V_nmf[i][j] = V_nmf[i][j] * sqrt(Numer_V / Denom_V);
-			if (V_nmf[i][j] < epsi)
-			{
-				V_nmf[i][j] = epsi;
-			}
-		}
-		for (k = 0; k < nfreq; k++)
-		{
-			lambda[i][k] = 0.0;
-			for (j = 0; j < Nrank; j++)
-			{
-				lambda[i][k] += V_nmf[i][j] * T_nmf[i][j][k];
-			}
-			p[i][k] = (1 - f_alpha) / lambda[i][k];
 		}
 	}
 
 	for (ch = 0; ch < Nch; ch++)
 	{
+		for (freq = 0; freq < nfreq; freq++)
+		{
+			phi[ch][freq] = 0.0;
+			for (cliq = 0; cliq < CLIQUE.ncliq; cliq++)
+			{
+				phi[ch][freq] += CLIQUE.C[cliq][freq] / lambda[ch][cliq];
+			}
+			p[ch][freq] = (1 - f_alpha)*phi[ch][freq];
+		}
+	}
+	
+	for (ch = 0; ch < Nch; ch++)
+	{
 		if (frameInd == 3)
 		{
+			for (freqInd = 0; freqInd < nfreq; freqInd++)
+			{
+				for (channel = 0; channel < Nch; channel++)
+				{
+					X_r[channel][freqInd*2] = X[channel][freqInd*2] * phi[ch][freqInd];
+					X_r[channel][freqInd*2+1] = X[channel][freqInd*2+1] * phi[ch][freqInd];
+				}
+			}
 			for (freqInd = 0; freqInd < nfreq; freqInd++)
 			{
 				re = freqInd + freqInd;
@@ -597,8 +501,8 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 				{
 					for (ch2 = 0; ch2 < Nch; ch2++)
 					{
-						V[ch1][ch2][re][ch] = (X[ch1][re] * X[ch2][re] + X[ch1][im] * X[ch2][im]) / lambda[ch][freqInd];
-						V[ch1][ch2][im][ch] = (X[ch1][im] * X[ch2][re] - X[ch1][re] * X[ch2][im]) / lambda[ch][freqInd];
+						V[ch1][ch2][re][ch] = X_r[ch1][re] * X[ch2][re] + X_r[ch1][im] * X[ch2][im];
+						V[ch1][ch2][im][ch] = X_r[ch1][im] * X[ch2][re] - X_r[ch1][re] * X[ch2][im];
 					}
 				}
 				// Calculate diag_WV
@@ -647,7 +551,10 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 			{
 				re = freqInd + freqInd;
 				im = re + 1;
+
+
 				// Calculate p_U_X
+
 				for (channel = 0; channel < Nch; channel++)
 				{
 					p_U_X[channel][re] = 0.0;
@@ -700,7 +607,7 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 
 				if (sqrt((Unumer[re] * Unumer[re]) + (Unumer[im] * Unumer[im])) < epsi)
 				{
-					Unumer[re] = 1E-6;
+					Unumer[re] = eps;
 					Unumer[im] = 0.0;
 				}
 				// Calculate V
@@ -712,7 +619,7 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 						V[ch1][ch2][im][ch] = f_alpha * V[ch1][ch2][im][ch] + p[ch][freqInd] * (X[ch1][im] * X[ch2][re] - X[ch1][re] * X[ch2][im]);
 					}
 				}
-				// Calculate U
+				//Calculate U
 				for (ch1 = 0; ch1 < Nch; ch1++)
 				{
 					for (ch2 = 0; ch2 < Nch; ch2++)
@@ -904,7 +811,7 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 		for (i = 0; i < nWin - BufferSize; i++)
 		{
 			Ybuff[ch1][i] = Ybuff[ch1][BufferSize + i];
-			Ybuff[ch1][i] += Ytmp[ch1][i] * win_STFT[i];
+			Ybuff[ch1][i] += Ytmp[ch1][i]* win_STFT[i];
 		}
 		for (; i < nWin; i++)
 		{
@@ -921,3 +828,134 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 	}
 }
 
+clique::clique(int opt)
+{
+	int i;
+	nfft = nWin;
+	nfreq = nfft / 2 + 1;
+	option = opt;
+	if (option == 0)
+	{
+		ncliq = 1;
+	}
+	else if (option == 1)
+	{
+		ncliq = 7;
+	}
+	else if (option == 2)
+	{
+		ncliq = 40;
+	}
+	C = new double *[ncliq+1];
+	for (i = 0; i < ncliq+1; i++)
+	{
+		C[i] = new double[nfreq];
+	}
+}
+
+clique::~clique()
+{
+	int i;
+	for (i = 0; i < ncliq; i++)
+	{
+		delete[] C[i];
+	}
+	delete[] C;
+}
+
+void clique::clique_matrix()
+{
+	int i,j;
+	if (option == 0)
+	{
+		for (i = 0; i < ncliq; i++)
+		{
+			for (j = 0; j < nfreq; j++)
+			{
+				C[i][j] = 1;
+			}
+		}
+	}
+	else if (option == 1)
+	{
+		int subband;
+		subband = (nfreq - 1) / 4;
+		for (i = 0; i < ncliq; i++)
+		{
+			for (j = 0; j < nfreq; j++)
+			{
+				C[i][j] = 0;
+			}
+			if (i == ncliq - 1)
+			{
+				for (j = i * subband / 2; j < nfreq; j++)
+				{
+					C[i][j] = 1;
+				}
+			}
+			else
+			{
+				for (j = i * subband / 2; j < (i + 2)*subband / 2; j++)
+				{
+					C[i][j] = 1;
+				}
+			}
+		}
+	}
+	else if (option == 2)
+	{
+		int h, freq, m;
+		f_k = new double[ nfft / 2 + 1];
+		for (i = 0; i < nfft/2+1; i++)
+		{
+			f_k[i] = i * SamplingFreq / double(nfft);
+		}
+		int maxH = ncliq-1;
+		int maxh = 10;
+		double U = 2;
+		double F1 = 55;
+		double resol = 10;
+		double thin = 12;
+		double delta = 1 - pow(U,-1 / thin);
+		F_h = new double [maxH];
+		for (i = 0; i < maxH; i++)
+		{
+			F_h[i] = F1 * pow(U, i / resol);
+		}
+		for (i = 0; i < maxH+1; i++)
+		{
+			for (j = 0; j < nfreq; j++)
+			{
+				if (i == maxH)
+				{
+					C[i][j] = 1.0;
+				}
+				else
+				{
+					C[i][j] = 0.0;
+				}
+			}
+		}
+
+		for (h = 0; h < maxH; h++)
+		{
+			for (freq = 0; freq < nfreq; freq++)
+			{
+				for (m = 0; m < maxh; m++)
+				{
+					if (m*F_h[h] < SamplingFreq / 2)
+					{
+						if ( (( f_k[freq] / (m * F_h[h]) - 1) < delta) && ( (f_k[freq] / (m * F_h[h]) - 1) > -delta) )
+						{
+							C[h][freq] = 1.0;
+						}
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
+}
