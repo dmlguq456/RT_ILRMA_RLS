@@ -1,4 +1,4 @@
-# RT_AUXIVA_RLS
+# RT_ILRMA_RLS
 
 ---
 
@@ -6,12 +6,26 @@
 
 서강대 전자공학과 박형민 교수님 연구실에서 제작한 octa capture microphone을 사용한 실시간 입출력 처리 모듈이며, 여러 화자가 동시에 발화하는 다채널 음원 신호를 입력으로 해당 알고리즘이 예측한 음원 분리 결과를 실시간 line-out 출력 및 std out 혹은 wav파일을 반환 합니다.
 
-## **독립성분분석(Independent Vector Analysis, IVA)**
+## **IVA(Independent Vector Analysis)**
 
 여러 독립적인 신호가 뒤섞인 음원에 대해서 각 출력 채널이 최대한 독립적인 신호로 구성되도록 분리하는 알고리즘입니다.
 
 1. 정상적으로 음원이 분리가 되기 위해서는 입력 마이크 채널의 개수보다 음원의 개수가 더 적어야 합니다.
 2. 어떤 음원이 몇 번째 출력 채널로 분리되어 나올지 알 수 없습니다.
+
+## **NMF(Non-negative Marix Factorization)**
+
+어떤 비음수로만 구성된 행렬에 대해서 이를 rank수 만큼의 열과 행에 대한 bases로 분석하는 알고리즘입니다. 예를 들어 아래와 같이 어떤 Spectrogram이 주어지면, 이를 주파수 축으로 어떻게 표현되는지를 나타내는 basis **w**와 프레임(시간) 축으로 언제 표현되는지를 나타내는 activation **h**으로 지정한 rank=3개 만큼으로 분석합니다.
+
+![./Sample_Spec/NMF.png](./Sample_Spec/NMF_illustration.png)
+
+
+## **ILRMA(Independent Low-rank Matrix Analysis)**
+
+IVA와 NMF를 결합한 알고리즘으로, 여러 독립적인 신호가 모두 low-rank의 spectrogram을 가지고 있다고 가정하고 이를 NMF로 분석합니다. 이를 통해 IVA보다 좀 더 정확한 source model를 설계하여 더 높은 분리 성능을 보여줍니다.
+
+
+
 
 ## Prerequisite
 
