@@ -134,7 +134,7 @@ int inout(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 int main(void)
 {
 	unsigned int channels, fs, bufferBytes, oDevice = 0, iDevice = 0, iOffset = 0, oOffset = 0;
-	double time = 16;
+	double time = 8;
 	int in_buffer_cnt = 0;
 	int out_buffer_cnt = 0;
 	int i, j, ch;

@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{534AB155-A5C2-46DF-A45F-A38A08AC8737}</ProjectGuid>
-    <RootNamespace>RT_AUXIVA_ICD_RLS</RootNamespace>
+    <RootNamespace>RT_ILRMA_RLS</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>RT_AUXIVA_ICD_RLS</ProjectName>
+    <ProjectName>RT_ILRMA_RLS</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -116,8 +116,8 @@
     <ClCompile Include="asio.cpp" />
     <ClCompile Include="asiodrivers.cpp" />
     <ClCompile Include="asiolist.cpp" />
-    <ClCompile Include="AUXIVA_ICD_Online.cpp" />
     <ClCompile Include="iasiothiscallresolver.cpp" />
+    <ClCompile Include="ILRMA_Online.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ProcBuffers.cpp" />
     <ClCompile Include="RtAudio.cpp" />
@@ -132,11 +132,11 @@
     <ClInclude Include="asiolib.h" />
     <ClInclude Include="asiolist.h" />
     <ClInclude Include="asiosys.h" />
-    <ClInclude Include="AUXIVA_ICD_Online.h" />
     <ClInclude Include="ginclude.h" />
     <ClInclude Include="header.h" />
     <ClInclude Include="iasiodrv.h" />
     <ClInclude Include="iasiothiscallresolver.h" />
+    <ClInclude Include="ILRMA_Online.h" />
     <ClInclude Include="ProcBuffers.h" />
     <ClInclude Include="RtAudio.h" />
     <ClInclude Include="sigproc.h" />
