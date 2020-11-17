@@ -33,7 +33,7 @@ IVA와 NMF를 결합한 알고리즘으로, 여러 독립적인 신호가 모두
 
 [The RtAudio Home Page](https://www.music.mcgill.ca/~gary/rtaudio/)
 
-## Setting Parameter in AUXIVA_ICD_Online.h
+## Setting Parameter in ILRMA_Online.h
 
 ```cpp
 #define Nch			2
