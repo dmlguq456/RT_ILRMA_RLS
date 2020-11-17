@@ -580,6 +580,7 @@ void ILRMA::ILRMA_lemma(double** input, int frameInd, double** output)
 			{
 				lambda[i][k] += V_nmf[i][j] * T_nmf[i][j][k];
 			}
+			if (lambda[i][k] < 1e-6) lambda[i][k] = 1e-6;
 			p[i][k] = (1 - f_alpha) / lambda[i][k];
 		}
 	}
